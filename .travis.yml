@@ -8,8 +8,10 @@ language: cpp
 
 env:
   matrix:
-    - COMPILER=gcc
-    - COMPILER=llvm
+    - COMPILER=gcc; BUILTIN_ZLIB=ON
+    - COMPILER=llvm; BUILTIN_ZLIB=ON
+    - COMPILER=gcc; BUILTIN_ZLIB=OFF
+    - COMPILER=llvm; BUILTIN_ZLIB=OFF
 
 
 before_install:
@@ -48,7 +50,7 @@ install:
 
 # command to run tests
 script:
-  - docker run -it --name CI_container -v $PKGDIR:/Package -e COMPILER=$COMPILER -v /cvmfs:/cvmfs -d clicdp/cc7-lcg /bin/bash
+  - docker run -it --name CI_container -v $PKGDIR:/Package -e COMPILER=$COMPILER -e BUILTIN_ZLIB=$BUILTIN_ZLIB -v /cvmfs:/cvmfs -d clicdp/cc7-lcg /bin/bash
   - if [[ "${TRAVIS_EVENT_TYPE}" == "cron" && "${COMPILER}" == "gcc"  ]];
     then docker exec -it CI_container /bin/bash -c "./Package/.travis-ci.d/coverity_scan.sh";
     elif [[ "${TRAVIS_EVENT_TYPE}" == "cron" && "${COMPILER}" == "llvm"  ]];
